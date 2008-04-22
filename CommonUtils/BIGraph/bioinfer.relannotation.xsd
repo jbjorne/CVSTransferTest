@@ -1,0 +1,102 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+
+<xsd:complexType name="relannotationType">
+	<xsd:sequence>
+		<xsd:element ref="reltoken" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="relentity" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="relnode" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="reledge" minOccurs="0" maxOccurs="unbounded" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="reltokenType">
+	<xsd:sequence>
+		<xsd:element ref="nestedsubtoken" minOccurs="0" maxOccurs="unbounded" />
+	</xsd:sequence>
+	<xsd:attribute ref="id" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="relentityType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="token" use="required" />
+	<xsd:attribute ref="type" use="required" />
+	<xsd:attribute ref="semanticId" use="required" />
+	<xsd:attribute ref="isName" use="required" />
+	<xsd:attribute ref="meta_annotation" />
+</xsd:complexType>
+
+<xsd:complexType name="reledgeType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="token" />
+	<xsd:attribute ref="type" use="required" />
+	<xsd:attribute ref="bgn" use="required" />
+	<xsd:attribute ref="end" use="required" />
+</xsd:complexType>
+
+
+
+
+
+<xsd:element name="relannotation" type="relannotationType">
+	<xsd:unique name="relentityUnique">
+		<xsd:selector xpath=".//relentity"/>
+		<xsd:field xpath="@token"/>
+		<xsd:field xpath="@type"/>
+		<xsd:field xpath="@semanticId"/>
+	</xsd:unique>
+
+	<!-- relnodes have no (additional) uniqueness restrictions -->
+
+	<xsd:unique name="reledgeUnique">
+		<xsd:selector xpath=".//reledge"/>
+		<xsd:field xpath="@type"/>
+		<xsd:field xpath="@bgn"/>
+		<xsd:field xpath="@end"/>
+	</xsd:unique>
+
+	<xsd:key name="reltokenKey">
+		<xsd:selector xpath=".//reltoken"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+	<xsd:key name="relentityKey">
+		<xsd:selector xpath=".//relentity"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+	<xsd:key name="relnodeKey">
+		<xsd:selector xpath=".//relnode"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+
+	<xsd:keyref name="rt2rbRef" refer="reltokenKey">
+		<xsd:selector xpath=".//relentity"/>
+		<xsd:field xpath="@token"/>
+	</xsd:keyref>
+	<xsd:keyref name="rb2rnRef" refer="relentityKey">
+		<xsd:selector xpath=".//relnode"/>
+		<xsd:field xpath="@entity"/>
+	</xsd:keyref>
+	<xsd:keyref name="rn2reBgnRef" refer="relnodeKey">
+		<xsd:selector xpath=".//reledge"/>
+		<xsd:field xpath="@bgn"/>
+	</xsd:keyref>
+	<xsd:keyref name="rn2reEndRef" refer="relnodeKey">
+		<xsd:selector xpath=".//reledge"/>
+		<xsd:field xpath="@end"/>
+	</xsd:keyref>
+
+</xsd:element>
+
+<xsd:element name="reltoken" type="reltokenType" />
+<xsd:element name="relentity" type="relentityType" />
+<xsd:element name="relnode" type="nodeType" />
+<xsd:element name="reledge" type="reledgeType" />
+
+
+
+
+
+</xsd:schema>

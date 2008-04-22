@@ -1,0 +1,109 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+
+<xsd:attribute name="id" type="xsd:string" />
+<xsd:attribute name="PMID" type="xsd:nonNegativeInteger" />
+<xsd:attribute name="text" type="xsd:string" />
+<xsd:attribute name="offset_bgn" type="xsd:nonNegativeInteger" />
+<xsd:attribute name="offset_end" type="xsd:nonNegativeInteger" />
+<xsd:attribute name="subtoken" type="xsd:string" />
+<xsd:attribute name="token" type="xsd:string" />
+<xsd:attribute name="entity" type="xsd:string" />
+<xsd:attribute name="bgn" type="xsd:string" />
+<xsd:attribute name="end" type="xsd:string" />
+<xsd:attribute name="type" type="xsd:string" />
+<xsd:attribute name="semanticId" type="xsd:nonNegativeInteger" />
+
+<xsd:attribute name="category">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="(expanded|standard|macro)(,(nonoverlayonly|overlayonly))?(,(connexoronly|lgonly))?" />
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="linkage">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="parallel"/>
+			<xsd:enumeration value="stanford"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="status">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="base"/>
+			<xsd:enumeration value="correct"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="group">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Physical"/>
+			<xsd:enumeration value="Process"/>
+			<xsd:enumeration value="Property"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="symmetric">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="True"/>
+			<xsd:enumeration value="False"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="effect">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Physical"/>
+			<xsd:enumeration value="Positive_regulation"/>
+			<xsd:enumeration value="Negative_regulation"/>
+			<xsd:enumeration value="Unspecified_regulation"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="special">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="True"/>
+			<xsd:enumeration value="False"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="isName">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="True"/>
+			<xsd:enumeration value="False"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+<xsd:attribute name="meta_annotation">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="automatic"/>
+			<xsd:enumeration value="manual"/>
+			<xsd:enumeration value="n/a"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:attribute>
+
+
+
+
+
+</xsd:schema>

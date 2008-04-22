@@ -1,0 +1,446 @@
+# Rethink the textbindings!
+
+#### Specific termination and translation rules ####
+
+# SUBSTRUCTURE cannot be handled
+# only names are present in the binary interaction ->
+# nonsense is produced unless either leaf is not Individual_protein
+root(A)+
+nodetype(A,SUBSTRUCTURE)+
+A(agent:B(D),patient:C)+
+leaf(C)+
+leaf(D)+
+nodetype(C,Individual_protein)+
+nodetype(D,Individual_protein)+
+>>>>
+log_match(Remove_SUBSTRUCTURE_null)+
+terminate(A)+
+print_log(A)+
+;
+
+root(A)+
+nodetype(A,SUBSTRUCTURE)+
+A(agent:B,patient:C(D))+
+leaf(B)+
+leaf(D)+
+nodetype(B,Individual_protein)+
+nodetype(D,Individual_protein)+
+>>>>
+log_match(Remove_SUBSTRUCTURE_null)+
+terminate(A)+
+print_log(A)+
+;
+
+# ABSENCE cannot be handled
+# (agent is always a third party to patient interaction)
+root(A)+
+nodetype(A,ABSENCE)+
+>>>>
+log_match(Remove_ABSENCE_null)+
+terminate(A)+
+print_log(A)+
+;
+
+# PRESENCE cannot be handled
+# (agent is always a third party to patient interaction)
+root(A)+
+nodetype(A,PRESENCE)+
+>>>>
+log_match(Remove_PRESENCE_null)+
+terminate(A)+
+print_log(A)+
+;
+
+# XOR cannot be handled
+root(A)+
+nodetype(A,XOR)+
+>>>>
+log_match(Remove_XOR_null)+
+terminate(A)+
+print_log(A)+
+;
+
+# CONTAIN -> BIND
+leaf(B)+
+A(patient:B)+
+not_root(A)+
+nodetype(A,CONTAIN)+
+>>>>
+log_match(Translate_CONTAIN_BIND)+
+A(agpat:B)+
+set_nodetype(A,BIND)+
+;
+
+# CONTAIN -> BIND
+leaf(C)+
+A(agent:B(sub:C))+
+not_root(A)+
+nodetype(A,CONTAIN)+
+>>>>
+log_match(Translate_CONTAIN_BIND)+
+A(agpat:C)+
+set_nodetype(A,BIND)+
+remove_node(B)+
+;
+
+# F-CONTAIN -> CROSS-LINK
+leaf(B)+
+A(patient:B)+
+not_root(A)+
+nodetype(A,F-CONTAIN)+
+>>>>
+log_match(Translate_F-CONTAIN_CROSS-LINK)+
+A(agpat:B)+
+set_nodetype(A,CROSS-LINK)+
+;
+
+# F-CONTAIN -> CROSS-LINK
+leaf(C)+
+A(agent:B(sub:C))+
+not_root(A)+
+nodetype(A,F-CONTAIN)+
+>>>>
+log_match(Translate_F-CONTAIN_CROSS-LINK)+
+A(agpat:C)+
+set_nodetype(A,CROSS-LINK)+
+remove_node(B)+
+;
+
+
+
+
+#### Specific root-based rules ####
+
+# NOT
+leaf(B)+
+A(polarity:B)+
+not_negated(B)+
+>>
+log_match(Process_NOT_single)+
+negate(A,B)+
+remove_node(B)+
+;
+
+# NOT-NOT
+leaf(B)+
+A(polarity:B)+
+negated(B)+
+>>
+log_match(Process_NOT_double)+
+remove_node(B)+
+;
+
+# CONTAIN-patient-patient
+root(A)+
+A(patient:B,patient:C)+
+nodetype(A,CONTAIN)+
+>>
+log_match(Process_CONTAIN_patient-patient)+
+A(agpat:B,agpat:C)+
+set_nodetype(A,BIND)+
+;
+
+# CONTAIN-agent-sub
+root(A)+
+A(agent:B(sub:D),patient:C)+
+nodetype(A,CONTAIN)+
+>>
+log_match(Process_CONTAIN_agent-sub-patient)+
+A(agpat:D,agpat:C)+
+set_nodetype(A,BIND)+
+remove_node(B)
+;
+
+# F-CONTAIN-patient-patient
+root(A)+
+A(patient:B,patient:C)+
+nodetype(A,F-CONTAIN)+
+>>
+log_match(Process_F-CONTAIN_patient-patient)+
+A(agpat:B,agpat:C)+
+set_nodetype(A,CROSS-LINK)+
+;
+
+# F-CONTAIN-agent-sub
+root(A)+
+A(agent:B(sub:D),patient:C)+
+nodetype(A,F-CONTAIN)+
+>>
+log_match(Process_F-CONTAIN_agent-sub-patient)+
+A(agpat:D,agpat:C)+
+set_nodetype(A,CROSS-LINK)+
+remove_node(B)
+;
+
+# MEDIATE-Causal-agent
+# (negation does not affect inference)
+root(A)+
+nodetype(A,MEDIATE)+
+A(agent:B,patient:C(agent:D))+
+nodetype_below(C,Causal)+
+>>
+log_match(Process_MEDIATE_Causal-agent)+
+A(agent:B,patient:D)+
+remove_node(C)+
+;
+
+# CAUSE-Causal-patient
+# (unexpressable as binary when C is negated -> approximation)
+root(A)+
+nodetype_action(A)+
+A(agent:B,patient:C(patient:D))+
+nodetype_below(C,Causal)+
+>>
+log_match(Process_CAUSE_Causal-patient)+
+C(agent:B,patient:D)+
+negate_add(C,A)+
+regulate(A)+
+remove_node(A)+
+;
+
+# CAUSE-Causal-agent
+root(A)+
+nodetype_action(A)+
+A(agent:B,patient:C(agent:D))+
+nodetype_below(C,Causal)+
+>>>> # uncertain inference -> no binary interaction
+log_match(Process_CAUSE_Causal-agent)+
+terminate(A)+
+print_log(A)+
+;
+
+# CAUSE-Causal-agpat
+# (unexpressable as binary when C is negated -> approximation)
+root(A)+
+nodetype_action(A)+
+A(agent:B,patient:C(agpat:D))+
+nodetype_below(C,Causal)+
+>>
+log_match(Process_CAUSE_Causal-agpat)+
+C(agent:B,patient:D)+
+set_nodetype_parent(C,C)+
+negate_add(C,A)+
+regulate(A)+
+remove_node(A)+
+;
+
+# CAUSE-property
+# (no need to handle negation of property)
+root(A)+
+nodetype_action(A)+
+A(agent:B,patient:C(D))+
+nodetype_property(C)+
+>>
+log_match(Process_CAUSE_Property)+
+A(agent:B,patient:D)+
+set_nodetype_change(A,C)+
+nested_add(A,C)+
+remove_node(C)+
+;
+
+# CAUSE (generic == Physical_entities/non-Causal)
+# (negation does not affect inference)
+# (no need to handle negation of physical)
+root(A)+
+nodetype_action(A)+
+A(agent:B,patient:C(D))+
+>>
+log_match(Process_CAUSE_generic)+
+A(agent:B,patient:D)+
+set_nodetype(A,Causal)+
+remove_node(C)+
+;
+
+# AFFECT-Property
+# (no need to handle negation of property)
+root(A)+
+nodetype(A,AFFECT)+
+A(agent:B,patient:C(D))+
+nodetype_property(C)+
+>>
+log_match(Process_AFFECT_Property)+
+A(agent:B,patient:D)+
+set_nodetype_change(A,C)+
+nested_add(A,C)+
+remove_node(C)+
+;
+
+
+
+
+#### Generic root-based rules ####
+
+# Remove patient-patient root (exceptions are already handled)
+
+root(A)+
+A(patient:B,patient:C)+
+>>>>
+log_match(Remove_patient-patient_null)+
+terminate(A)+
+print_log(A)+
+;
+
+# Agent side
+# (negations do not affect the inference on the agent side)
+# ('regulate'-command examines negations)
+
+# (regulatory agent)
+
+root(A)+
+A(agent:B(agent:C))+
+nodetype_regulation(B)+
+>>
+log_match(Process_Regulation_agent-agent)+
+A(agent:C)+
+remove_node(B)+
+;
+
+root(A)+
+A(agent:B(patient:C))+
+nodetype_regulation(B)+
+>>
+log_match(Process_Regulation_agent-patient)+
+A(agent:C)+
+regulate(B)+
+remove_node(B)+
+;
+
+# (no need for A(agent:B(agpat:C)) when B is regulatory)
+
+# (non-regulatory agent)
+
+root(A)+
+A(agent:B(agent:C))+
+not_nodetype_regulation(B)+
+>>
+log_match(Process_Nonregulation_agent-agent)+
+A(agent:C)+
+remove_node(B)+
+;
+
+root(A)+
+A(agent:B(patient:C))+
+not_nodetype_regulation(B)+
+>>
+log_match(Process_Nonregulation_agent-patient)+
+A(agent:C)+
+remove_node(B)+
+;
+
+root(A)+
+A(agent:B(agpat:C))+
+not_nodetype_regulation(B)+
+>>
+log_match(Process_Nonregulation_agent-agpat)+
+A(agent:C)+
+remove_node(B)+
+;
+
+# (physical agent)
+
+root(A)+
+nodetype_regulation(A)+
+A(agent:B,patient:C(patient:D))+
+nodetype_physical(B)+
+nodetype_process(C)+
+>>
+log_match(Process_Regulation_patient-patient)+
+C(agent:B,patient:D)+
+regulate(A)+
+remove_node(A)+
+;
+
+root(A)+
+nodetype_regulation(A)+
+A(agent:B,patient:C(agent:D))+
+nodetype_physical(B)+
+nodetype_process(C)+
+>>>> # uncertain inference -> no binary interaction
+log_match(Process_Regulation_patient-agent)+
+terminate(A)+
+print_log(A)+
+;
+
+root(A)+
+nodetype_regulation(A)+
+A(agent:B,patient:C(agpat:D))+
+nodetype_physical(B)+
+nodetype_process(C)+
+>>
+log_match(Process_Regulation_patient-agpat)+
+C(agent:B,patient:D)+
+set_nodetype_parent(C,C)+
+regulate(A)+
+remove_node(A)+
+;
+
+# Patient side
+# (patient side is handled by leaf-based rules)
+
+
+
+
+# Leaf truncations
+#
+# These should be applied only if nothing else matches
+# because they potentially destroy vital information
+#
+# Negations do not need to be considered.
+# (they are approximated away)
+
+leaf(B)+
+A(identity:B)+
+not_root(A)+
+>>
+log_match(Truncate_identity_null)+
+map_edges(A,B)+
+remove_node(A)
+;
+
+leaf(B)+
+A(possessor:B)+
+not_root(A)+
+>>
+log_match(Truncate_possessor_leaf)+
+map_edges(A,B)+
+remove_node(A)
+;
+
+leaf(B)+
+A(sub:B)+
+not_root(A)+
+>>
+log_match(Truncate_size_sub)+
+map_edges(A,B)+
+remove_node(A)
+;
+
+leaf(B)+
+A(super:B)+
+not_root(A)+
+>>
+log_match(Truncate_size_super)+
+map_edges(A,B)+
+remove_node(A)
+;
+
+# exception: try to remove properties-in-the-middle before
+#            truncating leaf processes
+A(possessor:B)+
+not_root(A)+
+>>
+log_match(Truncate_possessor_middle)+
+map_edges(A,B)+
+remove_node(A)
+;
+
+leaf(B)+
+A(B)+
+not_root(A)+
+nodetype_process(A)+
+nodetype_physical(B)+
+>>
+log_match(Truncate_process_null)+
+map_edges(A,B)+
+remove_node(A)
+;

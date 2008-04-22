@@ -1,0 +1,8 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:include schemaLocation="bioinfer.attributes.xsd"/>
+<xsd:include schemaLocation="bioinfer.corpus.xsd"/>
+<xsd:include schemaLocation="bioinfer.vocabularies.xsd"/>
+<xsd:include schemaLocation="bioinfer.sentences.xsd"/>
+<xsd:include schemaLocation="bioinfer.depannotation.xsd"/>
+<xsd:include schemaLocation="bioinfer.relannotation.xsd"/>
+</xsd:schema>

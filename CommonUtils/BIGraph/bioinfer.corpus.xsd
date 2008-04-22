@@ -1,0 +1,65 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+
+<xsd:complexType name="corpusType">
+	<xsd:sequence>
+		<xsd:element ref="vocabularies" />
+		<xsd:element ref="sentences" />
+	</xsd:sequence>
+	<xsd:attribute ref="id" use="required" />
+</xsd:complexType>
+
+
+
+
+
+<xsd:element name="corpus" type="corpusType">
+	<xsd:unique name="idsUnique">
+		<xsd:selector xpath=".//*"/>
+		<xsd:field xpath="@id"/>
+	</xsd:unique>
+
+	<xsd:key name="dbtypeKey">
+		<xsd:selector xpath=".//depentitytype"/>
+		<xsd:field xpath="@type"/>
+	</xsd:key>
+	<xsd:key name="detypeKey">
+		<xsd:selector xpath=".//depedgetype"/>
+		<xsd:field xpath="@type"/>
+	</xsd:key>
+	<xsd:key name="rbtypeKey">
+		<xsd:selector xpath=".//relentitytype"/>
+		<xsd:field xpath="@type"/>
+	</xsd:key>
+	<xsd:key name="retypeKey">
+		<xsd:selector xpath=".//reledgetype"/>
+		<xsd:field xpath="@type"/>
+	</xsd:key>
+
+	<xsd:keyref name="dbtypeRef" refer="dbtypeKey">
+		<xsd:selector xpath=".//depnode"/>
+		<xsd:field xpath="@type"/>
+	</xsd:keyref>
+	<xsd:keyref name="detypeRef" refer="detypeKey">
+		<xsd:selector xpath=".//depedge"/>
+		<xsd:field xpath="@type"/>
+	</xsd:keyref>
+	<xsd:keyref name="rbtypeRef" refer="rbtypeKey">
+		<xsd:selector xpath=".//relnode"/>
+		<xsd:field xpath="@type"/>
+	</xsd:keyref>
+	<xsd:keyref name="retypeRef" refer="retypeKey">
+		<xsd:selector xpath=".//reledge"/>
+		<xsd:field xpath="@type"/>
+	</xsd:keyref>
+
+</xsd:element>
+
+
+
+
+
+</xsd:schema>
