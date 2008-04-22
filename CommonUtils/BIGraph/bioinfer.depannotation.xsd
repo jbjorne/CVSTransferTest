@@ -1,0 +1,108 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+
+<xsd:complexType name="depannotationType">
+	<xsd:sequence>
+		<xsd:element ref="deptoken" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="depentity" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="depnode" minOccurs="0" maxOccurs="unbounded" />
+		<xsd:element ref="depedge" minOccurs="0" maxOccurs="unbounded" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="deptokenType">
+	<xsd:sequence>
+		<xsd:element ref="nestedsubtoken" minOccurs="1" maxOccurs="unbounded" />
+	</xsd:sequence>
+	<xsd:attribute ref="id" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="depentityType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="token" use="required" />
+	<xsd:attribute ref="type" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="depedgeType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="linkage" use="required" />
+	<xsd:attribute ref="category" use="required" />
+	<xsd:attribute ref="type" use="required" />
+	<xsd:attribute ref="bgn" use="required" />
+	<xsd:attribute ref="end" use="required" />
+	<xsd:attribute ref="status" use="required" />
+</xsd:complexType>
+
+
+
+
+
+<xsd:element name="depannotation" type="depannotationType">
+	<xsd:unique name="depentityUnique">
+		<xsd:selector xpath=".//depentity"/>
+		<xsd:field xpath="@token"/>
+		<!-- no @type and here disallows the same token in multiple roles -->
+	</xsd:unique>
+
+	<xsd:unique name="depnodeUnique">
+		<xsd:selector xpath=".//depnode"/>
+		<xsd:field xpath="@entity"/>
+	</xsd:unique>
+
+	<xsd:unique name="depedgeUnique">
+		<xsd:selector xpath=".//depedge"/>
+		<xsd:field xpath="@linkage"/>
+		<!-- Currently bgn-end pairs are formed by left-right order of token,
+         NOT by link direction. Thus bgn-end-type (not bgn-end) must be unique
+         within a linkage. As soon as pairs are correctly ordered remove @type
+         to disallow multiple edges between a pair. -->
+		<xsd:field xpath="@type"/>
+		<xsd:field xpath="@bgn"/>
+		<xsd:field xpath="@end"/>
+	</xsd:unique>
+
+	<xsd:key name="deptokenKey">
+		<xsd:selector xpath=".//deptoken"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+	<xsd:key name="depentityKey">
+		<xsd:selector xpath=".//depentity"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+	<xsd:key name="depnodeKey">
+		<xsd:selector xpath=".//depnode"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+
+	<xsd:keyref name="dt2dbRef" refer="deptokenKey">
+		<xsd:selector xpath=".//depentity"/>
+		<xsd:field xpath="@token"/>
+	</xsd:keyref>
+	<xsd:keyref name="db2dnRef" refer="depentityKey">
+		<xsd:selector xpath=".//depnode"/>
+		<xsd:field xpath="@entity"/>
+	</xsd:keyref>
+	<xsd:keyref name="dn2deBgnRef" refer="depnodeKey">
+		<xsd:selector xpath=".//depedge"/>
+		<xsd:field xpath="@bgn"/>
+	</xsd:keyref>
+	<xsd:keyref name="dn2deEndRef" refer="depnodeKey">
+		<xsd:selector xpath=".//depedge"/>
+		<xsd:field xpath="@end"/>
+	</xsd:keyref>
+
+</xsd:element>
+
+<xsd:element name="deptoken" type="deptokenType" />
+<xsd:element name="depentity" type="depentityType" />
+<xsd:element name="depnode" type="nodeType" />
+<xsd:element name="depedge" type="depedgeType" />
+
+
+
+
+
+</xsd:schema>

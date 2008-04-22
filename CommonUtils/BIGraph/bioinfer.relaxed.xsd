@@ -1,0 +1,86 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:include schemaLocation="bioinfer.attributes.xsd"/>
+<xsd:include schemaLocation="bioinfer.corpus.xsd"/>
+<xsd:include schemaLocation="bioinfer.vocabularies.xsd"/>
+<xsd:include schemaLocation="bioinfer.sentences.xsd"/>
+<xsd:include schemaLocation="bioinfer.depannotation.xsd"/>
+<xsd:include schemaLocation="bioinfer.relannotation.xsd"/>
+
+<!-- 
+relaxed attributes:
+ - annotators in sentence
+ - tag in relentitytype
+ - mapsto in relentitytype
+ - tag in relentity
+ - other in relentity
+-->
+
+
+
+
+
+<xsd:redefine schemaLocation="bioinfer.sentences.xsd">
+	<xsd:complexType name="sentenceType">
+		<xsd:complexContent>
+			<xsd:extension base="sentenceType">
+				<xsd:attribute name="relaxed_annotators" type="xsd:string" use="required" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:redefine>
+
+<xsd:redefine schemaLocation="bioinfer.vocabularies.xsd">
+	<xsd:complexType name="relentitytypeType">
+		<xsd:complexContent>
+			<xsd:extension base="relentitytypeType">
+				<xsd:attribute name="relaxed_tag" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="reltype"/>
+							<xsd:enumeration value="predicate"/>
+							<xsd:enumeration value="entitytype"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="relaxed_mapsTo" type="xsd:string" />
+<!--
+In 'compatible' mapsTo refers to relentitytype w/ group=='Process'.
+In 'relaxed' mapsTo does not refer to existing node.
+Because of this difference, this restriction is not checked.
+-->
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:redefine>
+
+<xsd:redefine schemaLocation="bioinfer.relannotation.xsd">
+	<xsd:complexType name="relentityType">
+		<xsd:complexContent>
+			<xsd:extension base="relentityType">
+				<xsd:attribute name="relaxed_tag" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="entity"/>
+							<xsd:enumeration value="relnode"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="relaxed_other" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="True"/>
+							<xsd:enumeration value="False"/>
+							<xsd:enumeration value="n/a"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:redefine>
+
+
+
+
+
+</xsd:schema>

@@ -1,0 +1,91 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+
+<xsd:complexType name="sentencesType">
+	<xsd:sequence>
+		<xsd:element ref="sentence" minOccurs="0" maxOccurs="unbounded" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="sentenceType">
+	<xsd:sequence>
+		<xsd:element ref="subtokens" />
+		<xsd:element ref="depannotation" />
+		<xsd:element ref="relannotation" />
+	</xsd:sequence>
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="PMID" use="required" />
+	<xsd:attribute ref="text" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="subtokensType">
+	<xsd:sequence>
+		<xsd:element ref="subtoken" minOccurs="0" maxOccurs="unbounded" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="subtokenType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="text" use="required" />
+	<xsd:attribute ref="offset_bgn" use="required" />
+	<xsd:attribute ref="offset_end" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="nestedsubtokenType">
+	<xsd:attribute ref="special" use="required" />
+	<xsd:attribute ref="subtoken" use="required" />
+</xsd:complexType>
+
+<xsd:complexType name="nodeType">
+	<xsd:attribute ref="id" use="required" />
+	<xsd:attribute ref="entity" use="required" />
+</xsd:complexType>
+
+
+
+
+
+<xsd:element name="sentences" type="sentencesType" />
+
+<xsd:element name="sentence" type="sentenceType">
+
+	<!-- all offsets of text must be assigned to exactly one subtoken
+       (implemented in Python) -->
+
+	<!-- each non-whitespace subtoken must be assigned to exactly one deptoken
+       (implemented in Python) -->
+
+	<!-- each reltoken must contain a unique combination of nestedsubtokens
+       ('special' flags count towards uniqueness)
+       (implemented in Python) -->
+
+	<xsd:key name="subtokenKey">
+		<xsd:selector xpath=".//subtoken"/>
+		<xsd:field xpath="@id"/>
+	</xsd:key>
+
+	<xsd:keyref name="subtokenRef" refer="subtokenKey">
+		<xsd:selector xpath=".//nestedsubtoken"/>
+		<xsd:field xpath="@subtoken"/>
+	</xsd:keyref>
+
+</xsd:element>
+
+<xsd:element name="subtokens" type="subtokensType" />
+<xsd:element name="subtoken" type="subtokenType" />
+
+<!-- remove nestedsubtoken node and replace directly with subtoken
+     as soon as @special is not needed anymore,
+     i.e. all flags are always identical within token
+     (e.g. prepositions are moved into edge textbindings) -->
+
+<xsd:element name="nestedsubtoken" type="nestedsubtokenType" />
+
+
+
+
+
+</xsd:schema>
