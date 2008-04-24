@@ -15,29 +15,20 @@ from utils.validator import Validator
 from binariser.binariser import Binariser
 
 def process(filestem):
-    old_complex = "%s.xml"%filestem
     new_complex = "%s.relaxed.xml"%filestem
     new_refined = "%s.refined.xml"%filestem
-    old_binary = "%s.binarised.xml"%filestem
-    new_binary = "%s.binarised.relaxed.xml"%filestem
-
-    Converter.convertFile(old_complex,new_complex,'old','relaxed')
 
     corpus = Corpus()
-    #corpus.readFromFile(new_complex)
     corpus.readFromFile(filestem)
-    #Validator.validate(corpus)
-    CorpusRefiner(corpus,NOT).resolveAll()
-    CorpusRefiner(corpus,EQUAL).resolveAll()
-    CorpusRefiner(corpus,COREFER).resolveAll()
-    CorpusRefiner(corpus,RELENT).resolveAll()
-    CorpusRefiner(corpus,MUTUAL).resolveAll()
+
+    #CorpusRefiner(corpus,NOT).resolveAll()
+    #CorpusRefiner(corpus,EQUAL).resolveAll()
+    #CorpusRefiner(corpus,COREFER).resolveAll()
+    #CorpusRefiner(corpus,RELENT).resolveAll()
+    #CorpusRefiner(corpus,MUTUAL).resolveAll()
     CorpusRefiner(corpus,Nesting).resolveAll()
-    CorpusRefiner(corpus,Pack).resolveAll()
-    #Validator.validate(corpus)
-    #CorpusRefiner(corpus,Binariser).resolveAll()
-    #Validator.validate(corpus)
-    #corpus.writeToFile(new_binary)
+    #CorpusRefiner(corpus,Pack).resolveAll()
+
     corpus.writeToFile(new_refined)
 
     #Converter.convertFile(new_binary,old_binary,'relaxed','old')
