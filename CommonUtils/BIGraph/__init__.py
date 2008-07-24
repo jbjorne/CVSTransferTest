@@ -34,7 +34,10 @@ binariser consists of classes involved in the binarisation of the corpus.
 
 import sys
 import string
-import cElementTree as ET
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import cElementTree as ET
 
 class SimpleElement:
     """

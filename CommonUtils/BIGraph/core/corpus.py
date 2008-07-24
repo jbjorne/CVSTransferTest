@@ -1,5 +1,8 @@
 import inspect
-import cElementTree as ET
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import cElementTree as ET
 from BIGraph import *
 from BIGraph.core.ontology import *
 from BIGraph.core.sentence import Sentence
