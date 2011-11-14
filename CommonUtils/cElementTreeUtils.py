@@ -7,6 +7,7 @@ Functions for easier use of cElementTree.
 
   Description: Convenience functions for easier use of cElementTree.
   Now in Git!
+  more text
 """
 __version__ = "$Revision: 1.19 $"
 
