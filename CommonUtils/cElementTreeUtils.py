@@ -6,6 +6,7 @@ Functions for easier use of cElementTree.
   Author:     Jari Bjoerne
 
   Description: Convenience functions for easier use of cElementTree.
+  Now in Git!
 """
 __version__ = "$Revision: 1.19 $"
 
